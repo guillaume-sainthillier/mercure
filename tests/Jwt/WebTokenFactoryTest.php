@@ -74,7 +74,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         }
     }
 
-    public function testInvalidAlgorithm()
+    public function testInvalidAlgorithm(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported algorithm "md5", expected one of "HS256", "HS384", "HS512", "ES256", "ES384", "ES512", "RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "EdDSA", "Ed25519".');
@@ -82,7 +82,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         WebTokenFactory::fromSecret(self::SECRET, 'md5');
     }
 
-    public function testRequiresRegisteredClaims()
+    public function testRequiresRegisteredClaims(): void
     {
         $factory = WebTokenFactory::fromSecret(self::SECRET);
 
@@ -92,7 +92,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $factory->create([new Grant([Grant::ACTION_SUBSCRIBE], ['a'])]);
     }
 
-    public function testRejectsNullOrEmptyRegisteredClaims()
+    public function testRejectsNullOrEmptyRegisteredClaims(): void
     {
         $factory = WebTokenFactory::fromSecret(self::SECRET);
 
@@ -102,7 +102,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $factory->create([new Grant([Grant::ACTION_SUBSCRIBE], ['a'])], ['iss' => 'https://example.com', 'aud' => '', 'sub' => 'urn:uuid:1', 'client_id' => 'https://example.com']);
     }
 
-    public function testClaimShape()
+    public function testClaimShape(): void
     {
         $factory = WebTokenFactory::fromSecret(self::SECRET, 'HS256', 3600);
 
@@ -139,7 +139,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $this->assertIsString($payload['jti']);
     }
 
-    public function testPayloadIsAttachedToSubscribeDetail()
+    public function testPayloadIsAttachedToSubscribeDetail(): void
     {
         $factory = WebTokenFactory::fromSecret(self::SECRET);
 
@@ -151,7 +151,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $this->assertSame(['foo' => 'bar'], $payload['authorization_details'][0]['payload']);
     }
 
-    public function testPayloadWithoutTopicsThrows()
+    public function testPayloadWithoutTopicsThrows(): void
     {
         $factory = WebTokenFactory::fromSecret(self::SECRET);
 
@@ -164,7 +164,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         );
     }
 
-    public function testSupportsRsaPssAlgorithm()
+    public function testSupportsRsaPssAlgorithm(): void
     {
         $factory = WebTokenFactory::fromSecret(self::PRIVATE_RSA_KEY, 'PS256');
 
@@ -177,7 +177,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
     /**
      * @group legacy
      */
-    public function testSupportsEdDsaAlgorithm()
+    public function testSupportsEdDsaAlgorithm(): void
     {
         $factory = WebTokenFactory::fromSecret(self::PRIVATE_ED25519_KEY, 'EdDSA');
 
@@ -187,7 +187,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $this->assertSame(['subscribe'], $payload['authorization_details'][0]['actions']);
     }
 
-    public function testSupportsEd25519Algorithm()
+    public function testSupportsEd25519Algorithm(): void
     {
         if (!class_exists(Ed25519::class)) {
             $this->markTestSkipped('requires web-token/jwt-library 4.3.');
@@ -201,7 +201,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $this->assertSame(['subscribe'], $payload['authorization_details'][0]['actions']);
     }
 
-    public function testEd25519RequiresWebToken43()
+    public function testEd25519RequiresWebToken43(): void
     {
         if (class_exists(Ed25519::class)) {
             $this->markTestSkipped('requires web-token/jwt-library < 4.3.');
@@ -213,7 +213,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         WebTokenFactory::fromSecret(self::PRIVATE_ED25519_KEY, 'Ed25519');
     }
 
-    public function testAcceptsAPreconfiguredJwsBuilder()
+    public function testAcceptsAPreconfiguredJwsBuilder(): void
     {
         $jwsBuilder = new JWSBuilder(new AlgorithmManager([new HS384(), new HS256()]));
         $factory = new WebTokenFactory($jwsBuilder, self::secretJwk(), 'HS256');
@@ -224,7 +224,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $this->assertSame(['subscribe'], $payload['authorization_details'][0]['actions']);
     }
 
-    public function testRejectsAnAlgorithmTheJwsBuilderDoesNotSupport()
+    public function testRejectsAnAlgorithmTheJwsBuilderDoesNotSupport(): void
     {
         $jwsBuilder = new JWSBuilder(new AlgorithmManager([new HS384()]));
 
@@ -234,7 +234,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         new WebTokenFactory($jwsBuilder, self::secretJwk(), 'HS256');
     }
 
-    public function testFromJwksUri()
+    public function testFromJwksUri(): void
     {
         $jwk = self::secretJwk(['kid' => 'key1']);
         $httpClient = new MockHttpClient(new MockResponse(json_encode(['keys' => [$jwk->jsonSerialize()]])));
@@ -247,7 +247,7 @@ MC4CAQAwBQYDK2VwBCIEIC2sHlY290BGA/Cr3ASUox+INF9KzT10bd96xOo5UPir
         $this->assertSame(['subscribe'], $payload['authorization_details'][0]['actions']);
     }
 
-    public function testFromJwksUriThrowsWhenKeyIdNotFound()
+    public function testFromJwksUriThrowsWhenKeyIdNotFound(): void
     {
         $jwk = self::secretJwk(['kid' => 'key1']);
         $httpClient = new MockHttpClient(new MockResponse(json_encode(['keys' => [$jwk->jsonSerialize()]])));

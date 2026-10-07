@@ -27,22 +27,22 @@ final class JwtClaimsTest extends TestCase
         'client_id' => 'https://example.com',
     ];
 
-    public function testResolveLifetimeNullMeansNoAutoExpiration()
+    public function testResolveLifetimeNullMeansNoAutoExpiration(): void
     {
         $this->assertNull(JwtClaims::resolveLifetime(null));
     }
 
-    public function testResolveLifetimeExplicitValueIsReturnedAsIs()
+    public function testResolveLifetimeExplicitValueIsReturnedAsIs(): void
     {
         $this->assertSame(3600, JwtClaims::resolveLifetime(3600));
     }
 
-    public function testResolveLifetimeZeroFallsBackToSessionCookieLifetimeOrDefault()
+    public function testResolveLifetimeZeroFallsBackToSessionCookieLifetimeOrDefault(): void
     {
         $this->assertSame((int) \ini_get('session.cookie_lifetime') ?: 3600, JwtClaims::resolveLifetime(0));
     }
 
-    public function testMultipleGrantsProduceMultipleEntries()
+    public function testMultipleGrantsProduceMultipleEntries(): void
     {
         $claims = JwtClaims::buildAuthorizationDetails(
             [new Grant([Grant::ACTION_SUBSCRIBE], ['a']), new Grant([Grant::ACTION_PUBLISH], ['b'])],
@@ -55,7 +55,7 @@ final class JwtClaimsTest extends TestCase
         $this->assertSame(['publish'], $claims['authorization_details'][1]['actions']);
     }
 
-    public function testSingleGrantWithMultipleActionsProducesOneEntry()
+    public function testSingleGrantWithMultipleActionsProducesOneEntry(): void
     {
         $claims = JwtClaims::buildAuthorizationDetails(
             [new Grant([Grant::ACTION_SUBSCRIBE, Grant::ACTION_PUBLISH], ['a'])],
@@ -67,7 +67,7 @@ final class JwtClaimsTest extends TestCase
         $this->assertSame(['subscribe', 'publish'], $claims['authorization_details'][0]['actions']);
     }
 
-    public function testGrantWithNoActionsThrows()
+    public function testGrantWithNoActionsThrows(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('A grant must declare at least one action.');
@@ -75,7 +75,7 @@ final class JwtClaimsTest extends TestCase
         JwtClaims::buildAuthorizationDetails([new Grant([], ['a'])], self::REQUIRED_CLAIMS, null);
     }
 
-    public function testEmptyTopicsGrantContributesNothing()
+    public function testEmptyTopicsGrantContributesNothing(): void
     {
         $claims = JwtClaims::buildAuthorizationDetails(
             [new Grant([Grant::ACTION_SUBSCRIBE], [])],
@@ -86,7 +86,7 @@ final class JwtClaimsTest extends TestCase
         $this->assertArrayNotHasKey('authorization_details', $claims);
     }
 
-    public function testEmptyTopicsGrantWithPayloadThrows()
+    public function testEmptyTopicsGrantWithPayloadThrows(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('requires at least one topic');
@@ -94,7 +94,7 @@ final class JwtClaimsTest extends TestCase
         JwtClaims::buildAuthorizationDetails([new Grant([Grant::ACTION_SUBSCRIBE], [], ['foo' => 'bar'])], self::REQUIRED_CLAIMS, null);
     }
 
-    public function testPayloadOnNonSubscribeGrantThrows()
+    public function testPayloadOnNonSubscribeGrantThrows(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('only meaningful when its "actions" include "subscribe"');

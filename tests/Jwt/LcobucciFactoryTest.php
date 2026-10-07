@@ -77,7 +77,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
     /**
      * @dataProvider provideCreateCases
      */
-    public function testCreate(string $secret, string $algorithm, ?array $subscribe, ?array $publish, array $additionalClaims, string $expectedJwt)
+    public function testCreate(string $secret, string $algorithm, ?array $subscribe, ?array $publish, array $additionalClaims, string $expectedJwt): void
     {
         \assert('' !== $secret);
         $factory = new LcobucciFactory($secret, $algorithm, null, protocolVersion: ProtocolVersion::Legacy);
@@ -88,14 +88,14 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         );
     }
 
-    public function testCreateWithEcdsaAlgorithm()
+    public function testCreateWithEcdsaAlgorithm(): void
     {
         $factory = new LcobucciFactory(self::PRIVATE_ECDSA_KEY, 'ecdsa.sha256', null, protocolVersion: ProtocolVersion::Legacy);
 
         $this->assertStringStartsWith('eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9', $factory->create($this->grants([], ['*'])));
     }
 
-    public function testCreateWithEncryptedRSAAlgorithm()
+    public function testCreateWithEncryptedRSAAlgorithm(): void
     {
         $factory = new LcobucciFactory(self::PRIVATE_RSA_ENCRYPTED_KEY, 'rsa.sha512', null, 'testing', ProtocolVersion::Legacy);
 
@@ -105,7 +105,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         );
     }
 
-    public function testInvalidAlgorithm()
+    public function testInvalidAlgorithm(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unsupported algorithm "md5", expected one of "hmac.sha256", "hmac.sha384", "hmac.sha512", "ecdsa.sha256", "ecdsa.sha384", "ecdsa.sha512", "rsa.sha256", "rsa.sha384", "rsa.sha512".');
@@ -113,7 +113,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         new LcobucciFactory('!ChangeMe!', 'md5');
     }
 
-    public function testPureExactMatcherArrayIsEquivalentToFlatList()
+    public function testPureExactMatcherArrayIsEquivalentToFlatList(): void
     {
         $factory = new LcobucciFactory('looooooooooooongenoughtestsecret', 'hmac.sha256', null, protocolVersion: ProtocolVersion::Legacy);
 
@@ -123,7 +123,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         );
     }
 
-    public function testNonExactMatcherTypeThrows()
+    public function testNonExactMatcherTypeThrows(): void
     {
         $factory = new LcobucciFactory('looooooooooooongenoughtestsecret', 'hmac.sha256', null, protocolVersion: ProtocolVersion::Legacy);
 
@@ -133,7 +133,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         $factory->create($this->grants([], ['urlpattern' => ['https://example.com/books/:id']]));
     }
 
-    public function testV1RequiresRegisteredClaims()
+    public function testV1RequiresRegisteredClaims(): void
     {
         $factory = new LcobucciFactory(self::SECRET, protocolVersion: ProtocolVersion::V1);
 
@@ -143,7 +143,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         $factory->create([new Grant([Grant::ACTION_SUBSCRIBE], ['a'])]);
     }
 
-    public function testV1RejectsNullOrEmptyRegisteredClaims()
+    public function testV1RejectsNullOrEmptyRegisteredClaims(): void
     {
         $factory = new LcobucciFactory(self::SECRET, protocolVersion: ProtocolVersion::V1);
 
@@ -153,7 +153,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         $factory->create([new Grant([Grant::ACTION_SUBSCRIBE], ['a'])], ['iss' => 'https://example.com', 'aud' => '', 'sub' => 'urn:uuid:1', 'client_id' => 'https://example.com']);
     }
 
-    public function testV1ClaimShape()
+    public function testV1ClaimShape(): void
     {
         $factory = new LcobucciFactory(self::SECRET, 'hmac.sha256', 3600, protocolVersion: ProtocolVersion::V1);
 
@@ -194,7 +194,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         $this->assertIsString($payload['jti']);
     }
 
-    public function testV1SingleGrantWithBothActionsProducesOneEntry()
+    public function testV1SingleGrantWithBothActionsProducesOneEntry(): void
     {
         $factory = new LcobucciFactory(self::SECRET, protocolVersion: ProtocolVersion::V1);
 
@@ -208,7 +208,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         $this->assertSame([['match' => 'a']], $payload['authorization_details'][0]['topics']);
     }
 
-    public function testV1PayloadIsAttachedToSubscribeDetail()
+    public function testV1PayloadIsAttachedToSubscribeDetail(): void
     {
         $factory = new LcobucciFactory(self::SECRET, protocolVersion: ProtocolVersion::V1);
 
@@ -220,7 +220,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         $this->assertSame(['foo' => 'bar'], $payload['authorization_details'][0]['payload']);
     }
 
-    public function testV1PayloadWithoutTopicsThrows()
+    public function testV1PayloadWithoutTopicsThrows(): void
     {
         $factory = new LcobucciFactory(self::SECRET, protocolVersion: ProtocolVersion::V1);
 
@@ -233,7 +233,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         );
     }
 
-    public function testV1PayloadOnPublishOnlyGrantThrows()
+    public function testV1PayloadOnPublishOnlyGrantThrows(): void
     {
         $factory = new LcobucciFactory(self::SECRET, protocolVersion: ProtocolVersion::V1);
 
@@ -246,7 +246,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         );
     }
 
-    public function testPre08TopicListGrantsThrow()
+    public function testPre08TopicListGrantsThrow(): void
     {
         $factory = new LcobucciFactory(self::SECRET, 'hmac.sha256', null);
 
@@ -257,7 +257,7 @@ TZCHmg89ySLBfCAspVeo63o/R7bs9a7BP9x2h5uwCBogSvkEwhhPKnboVN45bp9c
         $factory->create(['https://example.com/books/1'], ['*']);
     }
 
-    public function testPre08IntegerKeyedAdditionalClaimsThrow()
+    public function testPre08IntegerKeyedAdditionalClaimsThrow(): void
     {
         $factory = new LcobucciFactory(self::SECRET, 'hmac.sha256', null);
 

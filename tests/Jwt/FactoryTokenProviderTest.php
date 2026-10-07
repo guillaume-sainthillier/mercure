@@ -23,7 +23,7 @@ use Symfony\Component\Mercure\ProtocolVersion;
 
 final class FactoryTokenProviderTest extends TestCase
 {
-    public function testGetToken()
+    public function testGetToken(): void
     {
         if (!class_exists(Key\InMemory::class)) {
             $this->markTestSkipped('requires lcobucci/jwt.');
@@ -38,7 +38,7 @@ final class FactoryTokenProviderTest extends TestCase
         );
     }
 
-    public function testAdditionalClaimsAreForwardedToTheFactory()
+    public function testAdditionalClaimsAreForwardedToTheFactory(): void
     {
         $grants = [new Grant([Grant::ACTION_SUBSCRIBE], ['a']), new Grant([Grant::ACTION_PUBLISH], ['b'])];
 
@@ -46,7 +46,7 @@ final class FactoryTokenProviderTest extends TestCase
         $factory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo($grants), ['iss' => 'https://example.com'])
+            ->with($grants, ['iss' => 'https://example.com'])
         ;
 
         $provider = new FactoryTokenProvider($factory, $grants, ['iss' => 'https://example.com']);

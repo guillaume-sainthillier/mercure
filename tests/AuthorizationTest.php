@@ -32,9 +32,9 @@ use Symfony\Component\Mercure\Update;
 /**
  * @author Kévin Dunglas <kevin@dunglas.fr>
  */
-class AuthorizationTest extends TestCase
+final class AuthorizationTest extends TestCase
 {
-    public function testJwtLifetime()
+    public function testJwtLifetime(): void
     {
         if (!class_exists(InMemory::class)) {
             $this->markTestSkipped('"lcobucci/jwt" is not installed');
@@ -43,7 +43,7 @@ class AuthorizationTest extends TestCase
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             new LcobucciFactory('looooooooooooongenoughtestsecret', 'hmac.sha256', 3600, protocolVersion: ProtocolVersion::Legacy)
         ));
 
@@ -58,14 +58,14 @@ class AuthorizationTest extends TestCase
     /**
      * @group legacy
      */
-    public function testSetCookie()
+    public function testSetCookie(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
             ->with(
-                $this->equalTo([new Grant([Grant::ACTION_SUBSCRIBE], ['foo']), new Grant([Grant::ACTION_PUBLISH], ['bar'])]),
+                [new Grant([Grant::ACTION_SUBSCRIBE], ['foo']), new Grant([Grant::ACTION_PUBLISH], ['bar'])],
                 $this->arrayHasKey('x-foo')
             )
         ;
@@ -73,7 +73,7 @@ class AuthorizationTest extends TestCase
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -87,14 +87,14 @@ class AuthorizationTest extends TestCase
         $this->assertSame(Cookie::SAMESITE_LAX, $cookie->getSameSite());
     }
 
-    public function testSetCookieWithPublishGrant()
+    public function testSetCookieWithPublishGrant(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
             ->with(
-                $this->equalTo([new Grant([Grant::ACTION_SUBSCRIBE], ['foo']), new Grant([Grant::ACTION_PUBLISH], ['bar'])]),
+                [new Grant([Grant::ACTION_SUBSCRIBE], ['foo']), new Grant([Grant::ACTION_PUBLISH], ['bar'])],
                 $this->arrayHasKey('x-foo')
             )
         ;
@@ -102,7 +102,7 @@ class AuthorizationTest extends TestCase
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -116,19 +116,19 @@ class AuthorizationTest extends TestCase
         $this->assertSame(Cookie::SAMESITE_LAX, $cookie->getSameSite());
     }
 
-    public function testSetCookieWithTopicShorthand()
+    public function testSetCookieWithTopicShorthand(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo([new Grant([Grant::ACTION_SUBSCRIBE], ['foo'])]), $this->anything())
+            ->with([new Grant([Grant::ACTION_SUBSCRIBE], ['foo'])], $this->anything())
         ;
 
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -139,19 +139,19 @@ class AuthorizationTest extends TestCase
         $this->assertNotNull($request->attributes->get('_mercure_authorization_cookies')['']->getValue());
     }
 
-    public function testSetCookieWithStringShorthand()
+    public function testSetCookieWithStringShorthand(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo([new Grant([Grant::ACTION_SUBSCRIBE], ['foo'])]), $this->anything())
+            ->with([new Grant([Grant::ACTION_SUBSCRIBE], ['foo'])], $this->anything())
         ;
 
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -162,19 +162,19 @@ class AuthorizationTest extends TestCase
         $this->assertNotNull($request->attributes->get('_mercure_authorization_cookies')['']->getValue());
     }
 
-    public function testSetCookieWithGrantShapedArray()
+    public function testSetCookieWithGrantShapedArray(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo([new Grant([Grant::ACTION_SUBSCRIBE, Grant::ACTION_PUBLISH], ['foo'], 'x')]), $this->anything())
+            ->with([new Grant([Grant::ACTION_SUBSCRIBE, Grant::ACTION_PUBLISH], ['foo'], 'x')], $this->anything())
         ;
 
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -185,12 +185,12 @@ class AuthorizationTest extends TestCase
         $this->assertNotNull($request->attributes->get('_mercure_authorization_cookies')['']->getValue());
     }
 
-    public function testClearCookie()
+    public function testClearCookie(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             new class implements TokenFactoryInterface {
                 public function create(array $grants = [], array $additionalClaims = []): string
                 {
@@ -211,7 +211,7 @@ class AuthorizationTest extends TestCase
     /**
      * @dataProvider provideApplicableCookieDomains
      */
-    public function testApplicableCookieDomains(?string $expected, string $hubUrl, string $requestUrl)
+    public function testApplicableCookieDomains(?string $expected, string $hubUrl, string $requestUrl): void
     {
         if (!class_exists(InMemory::class)) {
             $this->markTestSkipped('"lcobucci/jwt" is not installed');
@@ -220,7 +220,7 @@ class AuthorizationTest extends TestCase
         $registry = new HubRegistry(new MockHub(
             $hubUrl,
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             new LcobucciFactory('looooooooooooongenoughtestsecret', 'hmac.sha256', 3600, protocolVersion: ProtocolVersion::Legacy)
         ));
 
@@ -243,7 +243,7 @@ class AuthorizationTest extends TestCase
     /**
      * @dataProvider provideNonApplicableCookieDomains
      */
-    public function testNonApplicableCookieDomains(string $hubUrl, string $requestUrl)
+    public function testNonApplicableCookieDomains(string $hubUrl, string $requestUrl): void
     {
         if (!class_exists(InMemory::class)) {
             $this->markTestSkipped('"lcobucci/jwt" is not installed');
@@ -252,7 +252,7 @@ class AuthorizationTest extends TestCase
         $registry = new HubRegistry(new MockHub(
             $hubUrl,
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             new LcobucciFactory('looooooooooooongenoughtestsecret', 'hmac.sha256', 3600, protocolVersion: ProtocolVersion::Legacy)
         ));
 
@@ -270,14 +270,14 @@ class AuthorizationTest extends TestCase
         yield ['https://mercure.internal.com', 'https://external.com'];
     }
 
-    public function testSetMultipleCookies()
+    public function testSetMultipleCookies(): void
     {
         $this->expectException(RuntimeException::class);
 
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             new class implements TokenFactoryInterface {
                 public function create(array $grants = [], array $additionalClaims = []): string
                 {
@@ -295,19 +295,19 @@ class AuthorizationTest extends TestCase
     /**
      * @group legacy
      */
-    public function testSetNullCookieTopics()
+    public function testSetNullCookieTopics(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo([]), $this->arrayHasKey('x-foo'))
+            ->with([], $this->arrayHasKey('x-foo'))
         ;
 
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -319,12 +319,12 @@ class AuthorizationTest extends TestCase
         $this->assertNotNull($cookie->getValue());
     }
 
-    public function testCookieNameComesFromTheHub()
+    public function testCookieNameComesFromTheHub(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             protocolVersion: ProtocolVersion::V1,
         ));
@@ -335,12 +335,12 @@ class AuthorizationTest extends TestCase
         $this->assertSame('__Secure-mercure_access_token', $cookie->getName());
     }
 
-    public function testPrefixedCookieNameOnPlainHttpHubThrowsWithAHint()
+    public function testPrefixedCookieNameOnPlainHttpHubThrowsWithAHint(): void
     {
         $registry = new HubRegistry(new MockHub(
             'http://localhost/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             protocolVersion: ProtocolVersion::V1,
         ));
@@ -353,12 +353,12 @@ class AuthorizationTest extends TestCase
         $authorization->createCookie(Request::create('http://localhost'));
     }
 
-    public function testPrefixLessCookieNameOnPlainHttpHubWorks()
+    public function testPrefixLessCookieNameOnPlainHttpHubWorks(): void
     {
         $registry = new HubRegistry(new MockHub(
             'http://localhost/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             cookieName: 'mercure_access_token',
             protocolVersion: ProtocolVersion::V1,

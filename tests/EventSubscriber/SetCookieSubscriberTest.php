@@ -26,9 +26,9 @@ use Symfony\Component\Mercure\EventSubscriber\SetCookieSubscriber;
 /**
  * @author Kévin Dunglas <kevin@dunglas.fr>
  */
-class SetCookieSubscriberTest extends TestCase
+final class SetCookieSubscriberTest extends TestCase
 {
-    public function testOnKernelResponse()
+    public function testOnKernelResponse(): void
     {
         $subscriber = new SetCookieSubscriber();
 
@@ -45,7 +45,7 @@ class SetCookieSubscriberTest extends TestCase
         $this->assertSame(array_values($cookies), $response->headers->getCookies());
     }
 
-    public function testWiring()
+    public function testWiring(): void
     {
         $this->assertInstanceOf(EventSubscriberInterface::class, new SetCookieSubscriber());
         $this->assertArrayHasKey(KernelEvents::RESPONSE, SetCookieSubscriber::getSubscribedEvents());

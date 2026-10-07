@@ -20,7 +20,7 @@ use Symfony\Component\Mercure\Jwt\TokenFactoryInterface;
 
 final class DefaultClaimsTokenFactoryTest extends TestCase
 {
-    public function testDefaultClaimsAreMergedIn()
+    public function testDefaultClaimsAreMergedIn(): void
     {
         $grants = [new Grant([Grant::ACTION_SUBSCRIBE], ['a'])];
 
@@ -28,14 +28,14 @@ final class DefaultClaimsTokenFactoryTest extends TestCase
         $decorated
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo($grants), ['iss' => 'https://example.com', 'sub' => 'default-sub'])
+            ->with($grants, ['iss' => 'https://example.com', 'sub' => 'default-sub'])
         ;
 
         $factory = new DefaultClaimsTokenFactory($decorated, ['iss' => 'https://example.com', 'sub' => 'default-sub']);
         $factory->create($grants);
     }
 
-    public function testCallTimeClaimsOverrideDefaults()
+    public function testCallTimeClaimsOverrideDefaults(): void
     {
         $grants = [new Grant([Grant::ACTION_SUBSCRIBE], ['a'])];
 
@@ -43,7 +43,7 @@ final class DefaultClaimsTokenFactoryTest extends TestCase
         $decorated
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo($grants), ['sub' => 'per-request-sub', 'iss' => 'https://example.com'])
+            ->with($grants, ['sub' => 'per-request-sub', 'iss' => 'https://example.com'])
         ;
 
         $factory = new DefaultClaimsTokenFactory($decorated, ['iss' => 'https://example.com', 'sub' => 'default-sub']);

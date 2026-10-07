@@ -31,14 +31,14 @@ use Symfony\Component\Mercure\Update;
 /**
  * @author Kévin Dunglas <kevin@dunglas.fr>
  */
-class MercureExtensionTest extends TestCase
+final class MercureExtensionTest extends TestCase
 {
-    public function testMercure()
+    public function testMercure(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class)
         ));
 
@@ -54,14 +54,12 @@ class MercureExtensionTest extends TestCase
         $this->assertInstanceOf(Cookie::class, $request->attributes->get('_mercure_authorization_cookies')['']);
     }
 
-    public function testMercureLastEventId()
+    public function testMercureLastEventId(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string {
-                return 'dummy';
-            },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class)
         ));
 
@@ -78,12 +76,12 @@ class MercureExtensionTest extends TestCase
         $this->assertSame('https://example.com/.well-known/mercure?match=https%3A%2F%2Ffoo%2Fbar&lastEventID=urn%3Auuid%3A13697bc5-e3c6-48cf-99c8-9d64c26f1a2f&Last-Event-ID=urn%3Auuid%3A13697bc5-e3c6-48cf-99c8-9d64c26f1a2f', $url);
     }
 
-    public function testMercureWithGrantsOption()
+    public function testMercureWithGrantsOption(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class)
         ));
 
@@ -98,19 +96,19 @@ class MercureExtensionTest extends TestCase
         $this->assertInstanceOf(Cookie::class, $request->attributes->get('_mercure_authorization_cookies')['']);
     }
 
-    public function testMercureWithGrantShapedArrayOption()
+    public function testMercureWithGrantShapedArrayOption(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo([new Grant([Grant::ACTION_SUBSCRIBE, Grant::ACTION_PUBLISH], ['https://foo/bar'])]), $this->anything())
+            ->with([new Grant([Grant::ACTION_SUBSCRIBE, Grant::ACTION_PUBLISH], ['https://foo/bar'])], $this->anything())
         ;
 
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -125,19 +123,19 @@ class MercureExtensionTest extends TestCase
         $this->assertInstanceOf(Cookie::class, $request->attributes->get('_mercure_authorization_cookies')['']);
     }
 
-    public function testMercurePublishOptionIsTranslatedToAGrant()
+    public function testMercurePublishOptionIsTranslatedToAGrant(): void
     {
         $tokenFactory = $this->createMock(TokenFactoryInterface::class);
         $tokenFactory
             ->expects($this->once())
             ->method('create')
-            ->with($this->equalTo([new Grant([Grant::ACTION_PUBLISH], ['https://foo/bar'])]), $this->anything())
+            ->with([new Grant([Grant::ACTION_PUBLISH], ['https://foo/bar'])], $this->anything())
         ;
 
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $tokenFactory
         ));
 
@@ -154,12 +152,12 @@ class MercureExtensionTest extends TestCase
         $this->assertInstanceOf(Cookie::class, $request->attributes->get('_mercure_authorization_cookies')['']);
     }
 
-    public function testMercurePayloadWithoutSubscribeThrows()
+    public function testMercurePayloadWithoutSubscribeThrows(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class)
         ));
 
@@ -174,12 +172,12 @@ class MercureExtensionTest extends TestCase
         $extension->mercure(null, ['payload' => 'foo']);
     }
 
-    public function testMercureV1FlatListIsExact()
+    public function testMercureV1FlatListIsExact(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             protocolVersion: ProtocolVersion::V1,
         ));
@@ -191,12 +189,12 @@ class MercureExtensionTest extends TestCase
         $this->assertSame('https://example.com/.well-known/mercure?match=https%3A%2F%2Ffoo%2Fbar', $url);
     }
 
-    public function testMercureV1MatcherTypedTopics()
+    public function testMercureV1MatcherTypedTopics(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             protocolVersion: ProtocolVersion::V1,
         ));
@@ -211,12 +209,12 @@ class MercureExtensionTest extends TestCase
         $this->assertSame('https://example.com/.well-known/mercure?match=https%3A%2F%2Ffoo%2Fbar&match_urlpattern=https%3A%2F%2Ffoo%2Fbooks%2F%3Aid', $url);
     }
 
-    public function testMercureV1MatcherTypeIsUrlEncoded()
+    public function testMercureV1MatcherTypeIsUrlEncoded(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             protocolVersion: ProtocolVersion::V1,
         ));
@@ -228,12 +226,12 @@ class MercureExtensionTest extends TestCase
         $this->assertSame('https://example.com/.well-known/mercure?match_urlpattern%26topic%3Devil=https%3A%2F%2Ffoo%2Fbar', $url);
     }
 
-    public function testMercureLegacyHubThrowsOnNonExactMatcherType()
+    public function testMercureLegacyHubThrowsOnNonExactMatcherType(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             protocolVersion: ProtocolVersion::Legacy,
         ));
@@ -246,12 +244,12 @@ class MercureExtensionTest extends TestCase
         $extension->mercure(['urlpattern' => ['https://foo/books/:id']]);
     }
 
-    public function testMercureLegacyHubAcceptsPureExactMatcherArray()
+    public function testMercureLegacyHubAcceptsPureExactMatcherArray(): void
     {
         $registry = new HubRegistry(new MockHub(
             'https://example.com/.well-known/mercure',
             new StaticTokenProvider('foo.bar.baz'),
-            static function (Update $u): string { return 'dummy'; },
+            static fn (Update $u): string => 'dummy',
             $this->createMock(TokenFactoryInterface::class),
             protocolVersion: ProtocolVersion::Legacy,
         ));
